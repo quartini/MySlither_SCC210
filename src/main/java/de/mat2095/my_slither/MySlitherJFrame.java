@@ -328,6 +328,7 @@ final class MySlitherJFrame extends JFrame {
         }
     }
 
+    // This method was changed to PUBLIC so that it could be accessed from the MyWebSocketClient() class.
     public void connect() {
         new Thread(() -> {
             if (status != Status.DISCONNECTED) {

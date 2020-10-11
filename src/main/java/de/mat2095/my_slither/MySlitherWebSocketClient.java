@@ -19,11 +19,13 @@ import java.util.stream.Collectors;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
+
+// These three new things were imported so that we could create a window with buttons
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-
+// 'implements ActionListener' was added here (for the JButtons to work)
 final class MySlitherWebSocketClient extends WebSocketClient implements ActionListener{
 
     private static final Map<String, String> HEADER = new LinkedHashMap<>();
@@ -41,6 +43,7 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
     private boolean lastBoostContent;
     private boolean waitingForPong;
 
+    // These new variables are declared here:
     private JFrame TheWindow = new JFrame();
     private JPanel mainPanel = new JPanel();
     private JPanel ButtonsPanel = new JPanel();
@@ -448,9 +451,12 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
         }
     }
 
+    // This method was added, for the JButton to work.
     public void actionPerformed(ActionEvent e) {
         view.connect();
     }
+
+    // This method is new as well:
 
     private void makePlayAgainWindow() {
 
@@ -466,6 +472,8 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
         TheWindow.setVisible(true);
 
     }
+
+
 
     private void processDead(int[] data) {
         if (data.length != 4) {
