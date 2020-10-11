@@ -107,8 +107,13 @@ final class MySlitherJFrame extends JFrame {
     MySlitherModel model;
     final Object modelLock = new Object();
 
+    
+
     MySlitherJFrame() {
         super("MySlither");
+        
+        
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -288,7 +293,10 @@ final class MySlitherJFrame extends JFrame {
                 }
             }
         }, 1, 10);
+
     }
+
+    
 
     void onOpen() {
         switch (status) {
@@ -320,7 +328,7 @@ final class MySlitherJFrame extends JFrame {
         }
     }
 
-    private void connect() {
+    public void connect() {
         new Thread(() -> {
             if (status != Status.DISCONNECTED) {
                 throw new IllegalStateException("Connecting while not disconnected");

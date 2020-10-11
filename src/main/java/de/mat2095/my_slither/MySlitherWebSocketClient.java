@@ -19,9 +19,12 @@ import java.util.stream.Collectors;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 
-final class MySlitherWebSocketClient extends WebSocketClient {
+final class MySlitherWebSocketClient extends WebSocketClient implements ActionListener{
 
     private static final Map<String, String> HEADER = new LinkedHashMap<>();
     private static final byte[] DATA_PING = new byte[]{(byte) 251};
@@ -37,6 +40,16 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     private byte lastAngleContent, angleToBeSent;
     private boolean lastBoostContent;
     private boolean waitingForPong;
+
+    private JFrame TheWindow = new JFrame();
+    private JPanel mainPanel = new JPanel();
+    private JPanel ButtonsPanel = new JPanel();
+    private ImageIcon i = new ImageIcon("Play Again.png");
+    private JLabel PlayAgain = new JLabel(i);
+    private BorderLayout layout = new BorderLayout();
+    private JButton Yes = new JButton("Yes!");
+    private JButton No = new JButton("No!");
+    private boolean Clicked;
 
     static {
         HEADER.put("Origin", "http://slither.io");
@@ -435,6 +448,25 @@ final class MySlitherWebSocketClient extends WebSocketClient {
         }
     }
 
+    public void actionPerformed(ActionEvent e) {
+        view.connect();
+    }
+
+    private void makePlayAgainWindow() {
+
+        mainPanel.setLayout(layout);
+        mainPanel.add(PlayAgain, layout.NORTH);
+        ButtonsPanel.add(Yes);
+        ButtonsPanel.add(No);
+        Yes.addActionListener(this);
+        mainPanel.add(ButtonsPanel, layout.CENTER);
+        TheWindow.setContentPane(mainPanel);
+        TheWindow.setSize(550, 200);
+        //TheWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        TheWindow.setVisible(true);
+
+    }
+
     private void processDead(int[] data) {
         if (data.length != 4) {
             view.log("dead wrong length!");
@@ -454,6 +486,10 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             default:
                 view.log("invalid death reason: " + deathReason + "!");
         }
+
+        makePlayAgainWindow();
+
+        
     }
 
     private void processAddSector(int[] data) {
