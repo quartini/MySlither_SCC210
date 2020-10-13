@@ -9,7 +9,8 @@ class Food {
     private final double rsp;
     private final long spawnTime;
     Color color = new Color(0, 0, 0);
-    int red = 255;
+    Color color2 = new Color(0, 0, 0);
+    int red = 0;
     int green = 0;
     int blue = 0;
 
@@ -19,7 +20,11 @@ class Food {
         this.size = size;
         this.rsp = fastSpawn ? 4 : 1;
         spawnTime = System.currentTimeMillis();
-        setColor();
+        color = setColor();
+        color2 = setColor();
+        while (color==color2){
+            color2 = setColor();
+        }
     }
 
     double getSize() {
@@ -35,10 +40,11 @@ class Food {
         }
     }
 
-    void setColor() {
+    Color setColor() {
         red = (int) ((Math.random() * (255)));
         green = (int) ((Math.random() * (255)));
         blue = (int) ((Math.random() * (255)));
-        color = new Color(red, green, blue);
+        Color c = new Color(red, green, blue);
+        return c;
     }
 }
