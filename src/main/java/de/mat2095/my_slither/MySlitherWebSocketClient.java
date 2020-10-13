@@ -47,12 +47,11 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
     private JFrame TheWindow = new JFrame();
     private JPanel mainPanel = new JPanel();
     private JPanel ButtonsPanel = new JPanel();
-    private ImageIcon i = new ImageIcon("Play Again.png");
-    private JLabel PlayAgain = new JLabel(i);
+
+    private JLabel PlayAgain = new JLabel(int align);
     private BorderLayout layout = new BorderLayout();
     private JButton Yes = new JButton("Yes!");
     private JButton No = new JButton("No!");
-    private boolean Clicked;
 
     static {
         HEADER.put("Origin", "http://slither.io");
@@ -63,6 +62,8 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
     MySlitherWebSocketClient(URI serverUri, MySlitherJFrame view) {
         super(serverUri, new Draft_6455(), HEADER);
         this.view = view;
+        //creating the Window with the "Play again?" buttons, but not setting it visible yet.
+        createPlayAgainWindow();
     }
 
     void sendData(Player.Wish wish) {
@@ -453,21 +454,29 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
 
     // This method was added, for the JButton to work.
     public void actionPerformed(ActionEvent e) {
-        view.connect();
+        if (e.getSource() == Yes) {
+            view.connect();
+        }
+        TheWindow.setVisible(false);
+    }
+
+    private void createPlayAgainWindow() {
+        mainPanel.setLayout(layout);
+        mainPanel.add(PlayAgain, layout.NORTH);
+        //mainPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ButtonsPanel.add(Yes);
+        ButtonsPanel.add(No);
+        Yes.addActionListener(this);
+        No.addActionListener(this);
+        mainPanel.add(ButtonsPanel, layout.CENTER);
+        TheWindow.setContentPane(mainPanel);
+        TheWindow.setSize(550, 200);
     }
 
     // This method is new as well:
 
-    private void makePlayAgainWindow() {
+    private void showPlayAgainWindow() {
 
-        mainPanel.setLayout(layout);
-        mainPanel.add(PlayAgain, layout.NORTH);
-        ButtonsPanel.add(Yes);
-        ButtonsPanel.add(No);
-        Yes.addActionListener(this);
-        mainPanel.add(ButtonsPanel, layout.CENTER);
-        TheWindow.setContentPane(mainPanel);
-        TheWindow.setSize(550, 200);
         //TheWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         TheWindow.setVisible(true);
 
@@ -481,21 +490,26 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
             return;
         }
         int deathReason = data[3];
+        String message;
         switch (deathReason) {
             case 0:
-                view.log("You died.");
+                message = "You died.";
+                view.log(message);
                 break;
             case 1:
-                view.log("You've achieved a new record!");
+                message = "You've achieved a new record!";
+                view.log(message);
                 break;
             case 2:
-                view.log("Death reason 2, unknown");
+                message = "Death reason 2, unknown";
+                view.log(message);
                 break;
             default:
-                view.log("invalid death reason: " + deathReason + "!");
+                message = "invalid death reason: " + deathReason + "!";
+                view.log(message);
         }
-
-        makePlayAgainWindow();
+        PlayAgain.setText(message + " Play again?");
+        showPlayAgainWindow();
 
         
     }
