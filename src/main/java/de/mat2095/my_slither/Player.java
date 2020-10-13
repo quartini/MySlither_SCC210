@@ -2,7 +2,6 @@ package de.mat2095.my_slither;
 
 import static de.mat2095.my_slither.MySlitherModel.PI2;
 
-
 abstract class Player {
 
     final String name;
