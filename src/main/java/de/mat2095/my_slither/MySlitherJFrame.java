@@ -13,76 +13,17 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Color;
 
 
 final class MySlitherJFrame extends JFrame {
 
     private static final String[] SNAKES = {
-        "00 - purple",
-        "01 - blue",
-        "02 - cyan",
-        "03 - green",
-        "04 - yellow",
-        "05 - orange",
-        "06 - salmon",
-        "07 - red",
-        "08 - violet",
-        "09 - flag: USA",
-        "10 - flag: Russia",
-        "11 - flag: Germany",
-        "12 - flag: Italy",
-        "13 - flag: France",
-        "14 - white/red",
-        "15 - rainbow",
-        "16 - blue/yellow",
-        "17 - white/blue",
-        "18 - red/white",
-        "19 - white",
-        "20 - green/purple",
-        "21 - flag: Brazil",
-        "22 - flag: Ireland",
-        "23 - flag: Romania",
-        "24 - cyan/yellow +extra",
-        "25 - purple/orange +extra",
-        "26 - grey/brown",
-        "27 - green with eye",
-        "28 - yellow/green/red",
-        "29 - black/yellow",
-        "30 - stars/EU",
-        "31 - stars",
-        "32 - EU",
-        "33 - yellow/black",
-        "34 - colorful",
-        "35 - red/white/pink",
-        "36 - blue/white/light-blue",
-        "37 - Kwebbelkop",
-        "38 - yellow",
-        "39 - PewDiePie",
-        "40 - green happy",
-        "41 - red with eyes",
-        "42 - Google Play",
-        "43 - UK",
-        "44 - Ghost",
-        "45 - Canada",
-        "46 - Swiss",
-        "47 - Moldova",
-        "48 - Vietnam",
-        "49 - Argentina",
-        "50 - Colombia",
-        "51 - Thailand",
-        "52 - red/yellow",
-        "53 - glowy-blue",
-        "54 - glowy-red",
-        "55 - glowy-yellow",
-        "56 - glowy-orange",
-        "57 - glowy-purple",
-        "58 - glowy-green",
-        "59 - yellow-M",
-        "60 - detailed UK",
-        "61 - glowy-colorful",
-        "62 - purple spiral",
-        "63 - red/black",
-        "64 - blue/black"
+        "blue",
+        "cyan",
+        "green",
+        "yellow",
+        "orange",
     };
 
     // TODO: skins, prey-size, snake-length/width, bot-layer, that-other-thing(?), show ping
@@ -428,6 +369,34 @@ final class MySlitherJFrame extends JFrame {
     void setHighscoreData(int row, String name, int length, boolean highlighted) {
         highscoreList.setValueAt(highlighted ? "<html><b>" + length + "</b></html>" : length, row, 0);
         highscoreList.setValueAt(highlighted ? "<html><b>" + name + "</b></html>" : name, row, 1);
+    }
+
+
+    public Color getColSnake(){
+
+        switch (snake.getSelectedIndex()) {
+            case 0:
+            return Color.blue;
+
+            case 1:
+            return Color.CYAN;
+
+            case 2:
+            return Color.green;
+
+            case 3:
+            return Color.YELLOW;
+
+            case 4:
+            return Color.orange;
+        
+            default:
+                break;
+        }
+        return Color.blue;
+
+        
+
     }
 
     private enum Status {

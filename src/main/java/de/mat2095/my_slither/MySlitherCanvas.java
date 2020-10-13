@@ -26,7 +26,7 @@ final class MySlitherCanvas extends JPanel {
     private static final float[] PREY_HALO_FRACTIONS = new float[]{0.5f, 1f};
     private static final Color[] PREY_HALO_COLORS = new Color[]{new Color(0x60FFFF00, true), new Color(0x00FFFF00, true)};
     private static final Color SNAKE_COLOR = new Color(0x287BDE);
-    private static final Color OWN_SNAKE_COLOR = new Color(0x39AFFF);
+    private static Color OWN_SNAKE_COLOR = new Color(0x39AFFF);
     private static final float[] SNAKE_HALO_FRACTIONS = new float[]{0.5f, 1f};
     private static final Color[] SNAKE_HALO_COLORS = new Color[]{new Color(0x60287BDE, true), new Color(0x00287BDE, true)};
     private static final Color[] OWN_SNAKE_HALO_COLORS = new Color[]{new Color(0x6039AFFF, true), new Color(0x0039AFFF, true)};
@@ -198,7 +198,7 @@ final class MySlitherCanvas extends JPanel {
             model.snakes.values().forEach(snake -> {
                 double thickness = 16 + snake.body.size() / 4.0;
                 if (snake.body.size() >= 2) {
-                    g.setColor(snake == model.snake ? OWN_SNAKE_BODY_COLOR : SNAKE_BODY_COLOR);
+                    g.setColor(snake == model.snake ? view.getColSnake() : SNAKE_BODY_COLOR);
                     g.setStroke(new BasicStroke((float) thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
                     double totalLength = 0; // TODO: respect FAM, ???
@@ -240,6 +240,7 @@ final class MySlitherCanvas extends JPanel {
                         snake == model.snake ? OWN_SNAKE_HALO_COLORS : SNAKE_HALO_COLORS));
                     g.fillRect((int) Math.round(snake.x - thickness * 3 / 2 - 1), (int) Math.round(snake.y - thickness * 3 / 2 - 1), (int) (thickness * 3 + 2), (int) (thickness * 3 + 2));
                 }
+                OWN_SNAKE_COLOR = view.getColSnake();
                 g.setColor(snake == model.snake ? OWN_SNAKE_COLOR : SNAKE_COLOR);
                 g.fill(new Ellipse2D.Double(snake.x - thickness * 2 / 3, snake.y - thickness * 2 / 3, thickness * 4 / 3, thickness * 4 / 3));
 
