@@ -20,7 +20,14 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
-final class MySlitherWebSocketClient extends WebSocketClient {
+
+// These three new things were imported so that we could create a window with buttons
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+// 'implements ActionListener' was added here (for the JButtons to work)
+final class MySlitherWebSocketClient extends WebSocketClient implements ActionListener{
 
     private static final Map<String, String> HEADER = new LinkedHashMap<>();
     private static final byte[] DATA_PING = new byte[] { (byte) 251 };
@@ -37,6 +44,15 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     private boolean lastBoostContent;
     private boolean waitingForPong;
 
+    // These new variables are declared here:
+    private JFrame TheWindow = new JFrame();
+    private JPanel mainPanel = new JPanel();
+    private JPanel ButtonsPanel = new JPanel();
+
+    private JLabel PlayAgain = new JLabel();
+    private JButton Yes = new JButton("Yes!");
+    private JButton No = new JButton("No!");
+
     static {
         HEADER.put("Origin", "http://slither.io");
         HEADER.put("Pragma", "no-cache");
@@ -46,6 +62,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     MySlitherWebSocketClient(URI serverUri, MySlitherJFrame view) {
         super(serverUri, new Draft_6455(), HEADER);
         this.view = view;
+        //creating the Window with the "Play again?" buttons, but not setting it visible yet.
+        createPlayAgainWindow();
     }
 
     void sendData(Player.Wish wish) {
@@ -437,25 +455,67 @@ final class MySlitherWebSocketClient extends WebSocketClient {
         }
     }
 
+    // This method was added, for the JButton to work.
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == Yes) {
+            view.connect();
+        }
+        TheWindow.setVisible(false);
+    }
+
+    // This function creates the window that asks if you want to play again,
+    // but doesn't show it!
+    private void createPlayAgainWindow() {
+        
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+        mainPanel.add(PlayAgain);
+        PlayAgain.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ButtonsPanel.add(Yes);
+        ButtonsPanel.add(No);
+        Yes.addActionListener(this);
+        No.addActionListener(this);
+        mainPanel.add(ButtonsPanel);
+        ButtonsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        TheWindow.setContentPane(mainPanel);
+        TheWindow.setSize(180, 140);
+        TheWindow.setLocationRelativeTo(null);
+    }
+
+
+
     private void processDead(int[] data) {
         if (data.length != 4) {
             view.log("dead wrong length!");
             return;
         }
         int deathReason = data[3];
+        String message;
+        // Now the message is assigned to a variable, which can be used
+        // in the log AND in the text in the window.
         switch (deathReason) {
             case 0:
-                view.log("You died.");
+                message = "You died.";
+                view.log(message);
                 break;
             case 1:
-                view.log("You've achieved a new record!");
+                message = "You've achieved a new record!";
+                view.log(message);
                 break;
             case 2:
-                view.log("Death reason 2, unknown");
+                message = "Death reason 2, unknown";
+                view.log(message);
                 break;
             default:
-                view.log("invalid death reason: " + deathReason + "!");
+                message = "invalid death reason: " + deathReason + "!";
+                view.log(message);
         }
+        // Added line setting the text to appear in the window to match
+        // the message logged - with "play again?" after it
+        // And sets the window to then be visible!
+        PlayAgain.setText(message + " Play again?");
+        TheWindow.setVisible(true);
+
+        
     }
 
     private void processAddSector(int[] data) {

@@ -58,6 +58,8 @@ final class MySlitherJFrame extends JFrame {
     MySlitherModel model;
     final Object modelLock = new Object();
 
+    
+
     MySlitherJFrame() {
         super("My Epic Slither");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -250,7 +252,10 @@ final class MySlitherJFrame extends JFrame {
                 }
             }
         }, 1, 10);
+
     }
+
+    
 
     void onOpen() {
         switch (status) {
@@ -282,7 +287,8 @@ final class MySlitherJFrame extends JFrame {
         }
     }
 
-    private void connect() {
+    // This method was changed to PUBLIC so that it could be accessed from the MyWebSocketClient() class.
+    public void connect() {
         new Thread(() -> {
             if (status != Status.DISCONNECTED) {
                 throw new IllegalStateException("Connecting while not disconnected");
