@@ -87,7 +87,7 @@ final class MySlitherJFrame extends JFrame {
 
         server = new JTextField(18);
 
-        name = new JTextField("dave", 16);
+        name = new JTextField("SnakeBOT3000", 16);
 
         snake = new JComboBox<>(SNAKES);
         snake.setMaximumRowCount(snake.getItemCount());
