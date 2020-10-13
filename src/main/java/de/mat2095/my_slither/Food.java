@@ -22,7 +22,7 @@ class Food {
         spawnTime = System.currentTimeMillis();
         color = setColor();
         color2 = setColor();
-        while (color==color2){
+        while (color == color2) {
             color2 = setColor();
         }
     }

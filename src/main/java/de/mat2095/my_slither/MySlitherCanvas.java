@@ -17,6 +17,10 @@ import javax.swing.*;
 
 final class MySlitherCanvas extends JPanel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private static final Color BACKGROUND_COLOR = new Color(0x2B2B2B);
     private static final Color FOREGROUND_COLOR = new Color(0xA9B7C6);
     private static final Color SECTOR_COLOR = new Color(0x803C3F41, true);
@@ -206,7 +210,7 @@ final class MySlitherCanvas extends JPanel {
                     g.setColor(snake == model.snake ? OWN_SNAKE_BODY_COLOR : SNAKE_BODY_COLOR);
                     g.setStroke(new BasicStroke((float) thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-                    double totalLength = 0; // TODO: respect FAM, ???
+                    double totalLength = 0;
                     double lastX = 0, lastY = 0;
                     for (SnakeBodyPart bodyPart : snake.body) {
                         if (bodyPart != snake.body.getFirst()) {
@@ -279,7 +283,7 @@ final class MySlitherCanvas extends JPanel {
 
             g.setColor(MAP_COLOR);
             g.drawOval(w - 80, h - 80, 79, 79);
-            boolean[] currentMap = map; // TODO: save map in model, set to null on reconnect
+            boolean[] currentMap = map;
             if (currentMap != null) {
                 for (int i = 0; i < currentMap.length; i++) {
                     if (currentMap[i]) {
