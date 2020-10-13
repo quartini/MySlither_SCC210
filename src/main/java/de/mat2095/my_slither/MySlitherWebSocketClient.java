@@ -48,8 +48,7 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
     private JPanel mainPanel = new JPanel();
     private JPanel ButtonsPanel = new JPanel();
 
-    private JLabel PlayAgain = new JLabel(int align);
-    private BorderLayout layout = new BorderLayout();
+    private JLabel PlayAgain = new JLabel();
     private JButton Yes = new JButton("Yes!");
     private JButton No = new JButton("No!");
 
@@ -460,26 +459,22 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
         TheWindow.setVisible(false);
     }
 
+    // This function creates the window that asks if you want to play again,
+    // but doesn't show it!
     private void createPlayAgainWindow() {
-        mainPanel.setLayout(layout);
-        mainPanel.add(PlayAgain, layout.NORTH);
-        //mainPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+        mainPanel.add(PlayAgain);
+        PlayAgain.setAlignmentX(Component.CENTER_ALIGNMENT);
         ButtonsPanel.add(Yes);
         ButtonsPanel.add(No);
         Yes.addActionListener(this);
         No.addActionListener(this);
-        mainPanel.add(ButtonsPanel, layout.CENTER);
+        mainPanel.add(ButtonsPanel);
+        ButtonsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         TheWindow.setContentPane(mainPanel);
-        TheWindow.setSize(550, 200);
-    }
-
-    // This method is new as well:
-
-    private void showPlayAgainWindow() {
-
-        //TheWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        TheWindow.setVisible(true);
-
+        TheWindow.setSize(180, 140);
+        TheWindow.setLocationRelativeTo(null);
     }
 
 
@@ -491,6 +486,8 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
         }
         int deathReason = data[3];
         String message;
+        // Now the message is assigned to a variable, which can be used
+        // in the log AND in the text in the window.
         switch (deathReason) {
             case 0:
                 message = "You died.";
@@ -508,8 +505,11 @@ final class MySlitherWebSocketClient extends WebSocketClient implements ActionLi
                 message = "invalid death reason: " + deathReason + "!";
                 view.log(message);
         }
+        // Added line setting the text to appear in the window to match
+        // the message logged - with "play again?" after it
+        // And sets the window to then be visible!
         PlayAgain.setText(message + " Play again?");
-        showPlayAgainWindow();
+        TheWindow.setVisible(true);
 
         
     }
