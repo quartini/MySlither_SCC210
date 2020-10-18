@@ -2,7 +2,6 @@ package de.mat2095.my_slither;
 
 import java.util.Deque;
 
-
 class Snake {
 
     final int id;
@@ -15,7 +14,8 @@ class Snake {
     final Deque<SnakeBodyPart> body;
     private final MySlitherModel model;
 
-    Snake(int id, String name, double x, double y, double wang, double ang, double sp, double fam, Deque<SnakeBodyPart> body, MySlitherModel model) {
+    Snake(int id, String name, double x, double y, double wang, double ang, double sp, double fam,
+            Deque<SnakeBodyPart> body, MySlitherModel model) {
         this.id = id;
         this.name = name;
         this.x = x;

@@ -4,7 +4,6 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 class MySlitherModel {
 
     static final double PI2 = Math.PI * 2;
@@ -14,7 +13,7 @@ class MySlitherModel {
     final double spangdv;
     final double nsp1, nsp2, nsp3;
     private final double mamu1, mamu2;
-    private final double cst; // TODO: usage?
+    private final double cst;
     private final int mscps;
     private final double[] fpsls, fmlts;
 
@@ -29,7 +28,8 @@ class MySlitherModel {
 
     Snake snake;
 
-    MySlitherModel(int gameRadius, int sectorSize, double spangdv, double nsp1, double nsp2, double nsp3, double mamu1, double mamu2, double cst, int mscps, MySlitherJFrame view) {
+    MySlitherModel(int gameRadius, int sectorSize, double spangdv, double nsp1, double nsp2, double nsp3, double mamu1,
+            double mamu2, double cst, int mscps, MySlitherJFrame view) {
         this.gameRadius = gameRadius;
         this.sectorSize = sectorSize;
         this.spangdv = spangdv;
@@ -126,7 +126,6 @@ class MySlitherModel {
                 cSnake.y += Math.sin(cSnake.ang) * snakeDistance;
             });
 
-            // TODO: eahang
             double preyDeltaAngle = mamu2 * deltaTime;
             preys.values().forEach(prey -> {
                 double preyDistance = prey.sp * deltaTime / 4.0;
@@ -171,7 +170,8 @@ class MySlitherModel {
         }
     }
 
-    void addSnake(int snakeID, String name, double x, double y, double wang, double ang, double sp, double fam, Deque<SnakeBodyPart> body) {
+    void addSnake(int snakeID, String name, double x, double y, double wang, double ang, double sp, double fam,
+            Deque<SnakeBodyPart> body) {
         synchronized (view.modelLock) {
             Snake newSnake = new Snake(snakeID, name, x, y, wang, ang, sp, fam, body, this);
             if (snake == null) {

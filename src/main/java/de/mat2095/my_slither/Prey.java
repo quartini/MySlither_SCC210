@@ -1,6 +1,5 @@
 package de.mat2095.my_slither;
 
-
 class Prey {
 
     double x, y;
@@ -21,7 +20,7 @@ class Prey {
         this.spawnTime = System.currentTimeMillis();
     }
 
-    double getRadius() { // TODO: factor?
+    double getRadius() {
         double fillRate = (System.currentTimeMillis() - spawnTime) / 1200.0;
         if (fillRate >= 1) {
             return size;
