@@ -21,12 +21,18 @@ import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
 
-final class MySlitherWebSocketClient extends WebSocketClient {
+// These three new things were imported so that we could create a window with buttons
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+// 'implements ActionListener' was added here (for the JButtons to work)
+final class MySlitherWebSocketClient extends WebSocketClient implements ActionListener{
 
     private static final Map<String, String> HEADER = new LinkedHashMap<>();
-    private static final byte[] DATA_PING = new byte[]{(byte) 251};
-    private static final byte[] DATA_BOOST_START = new byte[]{(byte) 253};
-    private static final byte[] DATA_BOOST_STOP = new byte[]{(byte) 254};
+    private static final byte[] DATA_PING = new byte[] { (byte) 251 };
+    private static final byte[] DATA_BOOST_START = new byte[] { (byte) 253 };
+    private static final byte[] DATA_BOOST_STOP = new byte[] { (byte) 254 };
     private static final double ANGLE_CONSTANT = 16777215;
 
     private final MySlitherJFrame view;
@@ -38,6 +44,15 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     private boolean lastBoostContent;
     private boolean waitingForPong;
 
+    // These new variables are declared here:
+    private JFrame TheWindow = new JFrame();
+    private JPanel mainPanel = new JPanel();
+    private JPanel ButtonsPanel = new JPanel();
+
+    private JLabel PlayAgain = new JLabel();
+    private JButton Yes = new JButton("Yes!");
+    private JButton No = new JButton("No!");
+
     static {
         HEADER.put("Origin", "http://slither.io");
         HEADER.put("Pragma", "no-cache");
@@ -47,6 +62,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     MySlitherWebSocketClient(URI serverUri, MySlitherJFrame view) {
         super(serverUri, new Draft_6455(), HEADER);
         this.view = view;
+        //creating the Window with the "Play again?" buttons, but not setting it visible yet.
+        createPlayAgainWindow();
     }
 
     void sendData(Player.Wish wish) {
@@ -57,7 +74,7 @@ final class MySlitherWebSocketClient extends WebSocketClient {
         if (angleToBeSent != lastAngleContent && System.currentTimeMillis() - lastAngleTime > 100) {
             lastAngleTime = System.currentTimeMillis();
             lastAngleContent = angleToBeSent;
-            send(new byte[]{angleToBeSent});
+            send(new byte[] { angleToBeSent });
         }
 
         if (wish.boost != null && wish.boost != lastBoostContent) {
@@ -96,7 +113,7 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     }
 
     @Override
-    public void onMessage(ByteBuffer bytes) { // TODO: use first two bytes
+    public void onMessage(ByteBuffer bytes) {
         byte[] b = bytes.array();
         if (b.length < 3) {
             view.log("too short");
@@ -396,7 +413,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             double newY = absoluteCoords ? (data[7] << 8) | data[8] : head.y + data[6] - 128;
 
             if (newBodyPart) {
-                snake.setFam(((data[absoluteCoords ? 9 : 7] << 16) | (data[absoluteCoords ? 10 : 8] << 8) | (data[absoluteCoords ? 11 : 9])) / ANGLE_CONSTANT);
+                snake.setFam(((data[absoluteCoords ? 9 : 7] << 16) | (data[absoluteCoords ? 10 : 8] << 8)
+                        | (data[absoluteCoords ? 11 : 9])) / ANGLE_CONSTANT);
             } else {
                 snake.body.pollLast();
             }
@@ -423,7 +441,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
         int cursorPosition = 8;
         while (cursorPosition + 6 < data.length) {
             int bodyLength = (data[cursorPosition] << 8) | data[cursorPosition + 1];
-            double fillAnount = ((data[cursorPosition + 2] << 16) | (data[cursorPosition + 3] << 8) | (data[cursorPosition + 4])) / ANGLE_CONSTANT;
+            double fillAnount = ((data[cursorPosition + 2] << 16) | (data[cursorPosition + 3] << 8)
+                    | (data[cursorPosition + 4])) / ANGLE_CONSTANT;
             int nameLength = data[cursorPosition + 6];
             StringBuilder name = new StringBuilder(nameLength);
             for (int i = 0; i < nameLength && cursorPosition + 7 + i < data.length; i++) {
@@ -431,9 +450,38 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             }
             cursorPosition += 7 + nameLength;
             rank++;
-            view.setHighscoreData(rank - 1, name.toString(), model.getSnakeLength(bodyLength, fillAnount), ownRank == rank);
+            view.setHighscoreData(rank - 1, name.toString(), model.getSnakeLength(bodyLength, fillAnount),
+                    ownRank == rank);
         }
     }
+
+    // This method was added, for the JButton to work.
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == Yes) {
+            view.connect();
+        }
+        TheWindow.setVisible(false);
+    }
+
+    // This function creates the window that asks if you want to play again,
+    // but doesn't show it!
+    private void createPlayAgainWindow() {
+        
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+        mainPanel.add(PlayAgain);
+        PlayAgain.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ButtonsPanel.add(Yes);
+        ButtonsPanel.add(No);
+        Yes.addActionListener(this);
+        No.addActionListener(this);
+        mainPanel.add(ButtonsPanel);
+        ButtonsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        TheWindow.setContentPane(mainPanel);
+        TheWindow.setSize(180, 140);
+        TheWindow.setLocationRelativeTo(null);
+    }
+
+
 
     private void processDead(int[] data) {
         if (data.length != 4) {
@@ -441,19 +489,33 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             return;
         }
         int deathReason = data[3];
+        String message;
+        // Now the message is assigned to a variable, which can be used
+        // in the log AND in the text in the window.
         switch (deathReason) {
             case 0:
-                view.log("You died.");
+                message = "You died.";
+                view.log(message);
                 break;
             case 1:
-                view.log("You've achieved a new record!");
+                message = "You've achieved a new record!";
+                view.log(message);
                 break;
             case 2:
-                view.log("Death reason 2, unknown");
+                message = "Death reason 2, unknown";
+                view.log(message);
                 break;
             default:
-                view.log("invalid death reason: " + deathReason + "!");
+                message = "invalid death reason: " + deathReason + "!";
+                view.log(message);
         }
+        // Added line setting the text to appear in the window to match
+        // the message logged - with "play again?" after it
+        // And sets the window to then be visible!
+        PlayAgain.setText(message + " Play again?");
+        TheWindow.setVisible(true);
+
+        
     }
 
     private void processAddSector(int[] data) {
@@ -500,7 +562,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             message.append((char) data[10 + nameLength + i]);
         }
 
-        view.log("Received Highscore of the day: " + name.toString() + " (" + model.getSnakeLength(bodyLength, fillAmount) + "): " + message.toString());
+        view.log("Received Highscore of the day: " + name.toString() + " ("
+                + model.getSnakeLength(bodyLength, fillAmount) + "): " + message.toString());
     }
 
     private void processPong(int[] data) {
@@ -559,13 +622,18 @@ final class MySlitherWebSocketClient extends WebSocketClient {
 
             int customSkinDataLength = data[nameLength + 25];
 
-            double currentBodyPartX = ((data[nameLength + customSkinDataLength + 26] << 16) | (data[nameLength + customSkinDataLength + 27] << 8) | data[nameLength + customSkinDataLength + 28]) / 5.0;
-            double currentBodyPartY = ((data[nameLength + customSkinDataLength + 29] << 16) | (data[nameLength + customSkinDataLength + 30] << 8) | data[nameLength + customSkinDataLength + 31]) / 5.0;
+            double currentBodyPartX = ((data[nameLength + customSkinDataLength + 26] << 16)
+                    | (data[nameLength + customSkinDataLength + 27] << 8)
+                    | data[nameLength + customSkinDataLength + 28]) / 5.0;
+            double currentBodyPartY = ((data[nameLength + customSkinDataLength + 29] << 16)
+                    | (data[nameLength + customSkinDataLength + 30] << 8)
+                    | data[nameLength + customSkinDataLength + 31]) / 5.0;
 
             Deque<SnakeBodyPart> body = new LinkedList<>();
             body.addFirst(new SnakeBodyPart(currentBodyPartX, currentBodyPartY));
 
-            for (int nextBodyPartStartPosition = nameLength + customSkinDataLength + 32; nextBodyPartStartPosition + 1 < data.length; nextBodyPartStartPosition += 2) {
+            for (int nextBodyPartStartPosition = nameLength + customSkinDataLength + 32; nextBodyPartStartPosition
+                    + 1 < data.length; nextBodyPartStartPosition += 2) {
                 currentBodyPartX += (data[nextBodyPartStartPosition] - 127) / 2.0;
                 currentBodyPartY += (data[nextBodyPartStartPosition + 1] - 127) / 2.0;
                 body.addFirst(new SnakeBodyPart(currentBodyPartX, currentBodyPartY));
@@ -581,7 +649,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     }
 
     private void processAddFood(int[] data, boolean allowMultipleEntities, boolean fastSpawn) {
-        if ((!allowMultipleEntities && data.length != 9) || (allowMultipleEntities && (data.length < 9 || ((data.length - 9) % 6 != 0)))) {
+        if ((!allowMultipleEntities && data.length != 9)
+                || (allowMultipleEntities && (data.length < 9 || ((data.length - 9) % 6 != 0)))) {
             view.log("add food wrong length!");
             return;
         }
@@ -589,7 +658,7 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             int x = (data[i - 4] << 8) | data[i - 3];
             int z = (data[i - 2] << 8) | data[i - 1];
             double radius = data[i] / 5.0;
-            model.addFood(x, z, radius, fastSpawn); // TODO: now always...
+            model.addFood(x, z, radius, fastSpawn);
         }
     }
 
@@ -607,7 +676,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
 
     private void processUpdatePrey(int[] data) {
 
-        if (data.length != 11 && data.length != 12 && data.length != 13 && data.length != 14 && data.length != 15 && data.length != 16 && data.length != 18) {
+        if (data.length != 11 && data.length != 12 && data.length != 13 && data.length != 14 && data.length != 15
+                && data.length != 16 && data.length != 18) {
             view.log("update prey wrong length!");
             return;
         }
@@ -659,7 +729,7 @@ final class MySlitherWebSocketClient extends WebSocketClient {
     private void processAddRemovePrey(int[] data) {
         if (data.length == 7) {
             int id = (data[3] << 8) | data[4];
-            int eaterID = (data[5] << 8) | data[6];
+            // int eaterID = (data[5] << 8) | data[6];
             model.removePrey(id);
         } else if (data.length == 5) {
             int id = (data[3] << 8) | data[4];
@@ -708,20 +778,21 @@ final class MySlitherWebSocketClient extends WebSocketClient {
 
         // pre-init request
         view.log("sending pre-init request");
-        send(new byte[]{99});
+        send(new byte[] { 99 });
     }
 
     static URI[] getServerList() {
 
         String i49526_String;
         try {
-            HttpURLConnection i49526_HttpURLConnection = (HttpURLConnection) new URL("http://slither.io/i33628.txt").openConnection();
+            HttpURLConnection i49526_HttpURLConnection = (HttpURLConnection) new URL("http://slither.io/i33628.txt")
+                    .openConnection();
             i49526_HttpURLConnection.setRequestProperty("User-Agent", "java/1.8.0_72");
             InputStream i49526_InputStream = i49526_HttpURLConnection.getInputStream();
             BufferedReader i49526_BufferedReader = new BufferedReader(new InputStreamReader(i49526_InputStream));
             i49526_String = i49526_BufferedReader.lines().collect(Collectors.joining("\n"));
         } catch (IOException ex) {
-            throw new Error("Error reading server-list!"); // TODO: set to disconnected
+            throw new Error("Error reading server-list!");
         }
 
         int[] data = new int[(i49526_String.length() - 1) / 2];
@@ -740,13 +811,9 @@ final class MySlitherWebSocketClient extends WebSocketClient {
         URI[] serverList = new URI[(i49526_String.length() - 1) / 22];
         for (int i = 0; i < serverList.length; i++) {
             try {
-                serverList[i] = new URI("ws://"
-                    + data[i * 11 + 0] + "."
-                    + data[i * 11 + 1] + "."
-                    + data[i * 11 + 2] + "."
-                    + data[i * 11 + 3] + ":"
-                    + ((data[i * 11 + 4] << 16) + (data[i * 11 + 5] << 8) + data[i * 11 + 6])
-                    + "/slither");
+                serverList[i] = new URI("ws://" + data[i * 11 + 0] + "." + data[i * 11 + 1] + "." + data[i * 11 + 2]
+                        + "." + data[i * 11 + 3] + ":"
+                        + ((data[i * 11 + 4] << 16) + (data[i * 11 + 5] << 8) + data[i * 11 + 6]) + "/slither");
             } catch (URISyntaxException ex) {
                 throw new Error("Error building server-address!");
             }

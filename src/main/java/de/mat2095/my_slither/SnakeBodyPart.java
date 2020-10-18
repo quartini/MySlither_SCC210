@@ -1,6 +1,5 @@
 package de.mat2095.my_slither;
 
-
 class SnakeBodyPart {
 
     double x, y;
