@@ -26,12 +26,11 @@ final class MySlitherCanvas extends JPanel {
     private static final float[] PREY_HALO_FRACTIONS = new float[]{0.5f, 1f};
     private static final Color[] PREY_HALO_COLORS = new Color[]{new Color(0x60FFFF00, true), new Color(0x00FFFF00, true)};
     private static final Color SNAKE_COLOR = new Color(0x287BDE);
-    private static Color OWN_SNAKE_COLOR = new Color(0x39AFFF);
     private static final float[] SNAKE_HALO_FRACTIONS = new float[]{0.5f, 1f};
     private static final Color[] SNAKE_HALO_COLORS = new Color[]{new Color(0x60287BDE, true), new Color(0x00287BDE, true)};
     private static final Color[] OWN_SNAKE_HALO_COLORS = new Color[]{new Color(0x6039AFFF, true), new Color(0x0039AFFF, true)};
     private static final Color SNAKE_BODY_COLOR = new Color(0x6A8759);
-    private static final Color OWN_SNAKE_BODY_COLOR = new Color(0xA5C261);
+    
     private static final Color MAP_COLOR = new Color(0xA0A9B7C6, true);
     private static final Color MAP_POSITION_COLOR = new Color(0xE09E2927, true);
     private static final Color NAME_SHADOW_COLOR = new Color(0xC02B2B2B, true);
@@ -44,6 +43,8 @@ final class MySlitherCanvas extends JPanel {
     private long lastFrameTime;
     private double fps;
     final ScheduledExecutorService repaintThread;
+
+    
 
     final MouseInput mouseInput = new MouseInput();
 
@@ -71,6 +72,8 @@ final class MySlitherCanvas extends JPanel {
     MySlitherCanvas(MySlitherJFrame view) {
         super();
         this.view = view;
+
+        
 
         setBackground(BACKGROUND_COLOR);
         setForeground(FOREGROUND_COLOR);
@@ -141,6 +144,9 @@ final class MySlitherCanvas extends JPanel {
         int h = getHeight();
         int m = Math.min(w, h);
 
+        Color OWN_SNAKE_BODY_COLOR = view.getColSnake();
+        Color OWN_SNAKE_COLOR = view.getColSnake();
+
         modelPaintBlock:
         synchronized (view.modelLock) {
             MySlitherModel model = view.model;
@@ -198,7 +204,7 @@ final class MySlitherCanvas extends JPanel {
             model.snakes.values().forEach(snake -> {
                 double thickness = 16 + snake.body.size() / 4.0;
                 if (snake.body.size() >= 2) {
-                    g.setColor(snake == model.snake ? view.getColSnake() : SNAKE_BODY_COLOR);
+                    g.setColor(snake == model.snake ? OWN_SNAKE_BODY_COLOR: SNAKE_BODY_COLOR);
                     g.setStroke(new BasicStroke((float) thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
                     double totalLength = 0; // TODO: respect FAM, ???
@@ -240,7 +246,7 @@ final class MySlitherCanvas extends JPanel {
                         snake == model.snake ? OWN_SNAKE_HALO_COLORS : SNAKE_HALO_COLORS));
                     g.fillRect((int) Math.round(snake.x - thickness * 3 / 2 - 1), (int) Math.round(snake.y - thickness * 3 / 2 - 1), (int) (thickness * 3 + 2), (int) (thickness * 3 + 2));
                 }
-                OWN_SNAKE_COLOR = view.getColSnake();
+                
                 g.setColor(snake == model.snake ? OWN_SNAKE_COLOR : SNAKE_COLOR);
                 g.fill(new Ellipse2D.Double(snake.x - thickness * 2 / 3, snake.y - thickness * 2 / 3, thickness * 4 / 3, thickness * 4 / 3));
 
